@@ -2,23 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\pegawai;
-use App\Models\pengguna;
+use App\Models\Pengguna as pengguna;
+use App\Models\TenagaKerja as tenaga_kerja;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 
-class PegawaiController extends Controller
+class TenagaKerjaController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $pegawai = pegawai::join('pengguna', 'pengguna.id_pengguna', 'pegawai.id_pengguna')
-            ->select('pegawai.*', 'pengguna.*')
-            ->paginate(10);
-        return view('pegawai/pegawai', compact('pegawai'))->with('i', (request()->input('page', 1) - 1) * 5);
+        $tenaga_kerja = tenaga_kerja::all();
+        return view('tenaga-kerja/tenaga-kerja', compact('tenaga_kerja'));
     }
 
     /**
@@ -27,7 +24,7 @@ class PegawaiController extends Controller
     public function create()
     {
         $data['pengguna'] = pengguna::all();
-        return view('pegawai/tambah-pegawai', $data);
+        return view('tenaga-kerja/tambah-tenaga-kerja', $data);
     }
 
     /**
@@ -42,14 +39,14 @@ class PegawaiController extends Controller
             'jenis_kelamin' => 'required',
         ]);
 
-        pegawai::create([
-            'id_pegawai' => rand(),
+        tenaga_kerja::create([
+            'id_tenagakerja' => rand(),
             'id_pengguna'  => $request->id_pengguna,
             'nama'  => $request->nama,
             'usia' => $request->usia,
             'jenis_kelamin' => $request->jenis_kelamin,
         ]);
-        return redirect("pegawai")->with("message", "Data berhasil disimpan");
+        return redirect("tenaga_kerja")->with("message", "Data berhasil disimpan");
     }
 
     /**
@@ -63,16 +60,16 @@ class PegawaiController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(pegawai $pegawai)
+    public function edit(tenaga_kerja $tenaga_kerja)
     {
         $data['pengguna'] = pengguna::all();
-        return view('pegawai/edit-pegawai', compact('pegawai'), $data);
+        return view('tenaga-kerja/edit-tenaga-kerja', compact('tenaga_kerja'), $data);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, pegawai $pegawai)
+    public function update(Request $request, tenaga_kerja $tenaga_kerja)
     {
         $request->validate([
             'nama' => 'required',
@@ -80,29 +77,29 @@ class PegawaiController extends Controller
             'jenis_kelamin' => 'required',
         ]);
 
-        $pegawai->update([
-            'id_pegawai' => rand(),
+        $tenaga_kerja->update([
+            'id_tenaga_kerja' => rand(),
             'id_pengguna' => $request->id_pengguna,
             'nama'  => $request->nama,
             'usia' => $request->usia,
             'jenis_kelamin' => $request->jenis_kelamin,
         ]);
-        return redirect("pegawai")->with("message", "Data berhasil disimpan");
+        return redirect("tenaga_kerja")->with("message", "Data berhasil disimpan");
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(pegawai $pegawai)
+    public function destroy(tenaga_kerja $tenaga_kerja)
     {
-        $pegawai->delete();
-        return redirect("pegawai");
+        $tenaga_kerja->delete();
+        return redirect("tenaga_kerja");
     }
 
     public function print()
     {
-        $pegawai = pegawai::all();
-        $pdf = Pdf::loadview('pegawai/laporan-pegawai', ['pegawai' => $pegawai])->setPaper('a4', 'landscape');
-        return $pdf->download('laporan-pegawai.pdf');
+        $tenaga_kerja = tenaga_kerja::all();
+        $pdf = Pdf::loadview('tenaga-kerja/laporan-tenaga-kerja', ['tenaga_kerja' => $tenaga_kerja])->setPaper('a4', 'landscape');
+        return $pdf->download('laporan-tenaga-kerja.pdf');
     }
 }
